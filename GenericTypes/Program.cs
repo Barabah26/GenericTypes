@@ -285,62 +285,111 @@
 //Console.WriteLine("Cuurency in Poland is " + countryToCurrencyMapping["Poland"]);
 
 
-var employees = new List<Employee>
-{
-    new Employee("Jake Smith", "Space Navigation", 25000),
-    new Employee("Anna Blake", "Space Navigation", 29000),
-    new Employee("Barbara Oak", "Xenobiology", 21500),
-    new Employee("Damien Parker", "Xenobiology", 22000),
-    new Employee("Hisha Patel", "Machanics", 21000),
-    new Employee("Gustavo Sanchez", "Machanics", 20000),
+//var employees = new List<Employee>
+//{
+//    new Employee("Jake Smith", "Space Navigation", 25000),
+//    new Employee("Anna Blake", "Space Navigation", 29000),
+//    new Employee("Barbara Oak", "Xenobiology", 21500),
+//    new Employee("Damien Parker", "Xenobiology", 22000),
+//    new Employee("Hisha Patel", "Machanics", 21000),
+//    new Employee("Gustavo Sanchez", "Machanics", 20000),
 
-};
+//};
 
-var result = CalculateAverageSalaryPerDepartment(employees);
+//var result = CalculateAverageSalaryPerDepartment(employees);
+
+//Console.ReadKey();
+
+//Dictionary<string, decimal> CalculateAverageSalaryPerDepartment(IEnumerable<Employee> employees)
+//{
+//    var employeesPerDepartments = new Dictionary<string, List<Employee>>();
+//    foreach (var employee in employees)
+//    {
+//        if(!employeesPerDepartments.ContainsKey(employee.Department))
+//        {
+//            employeesPerDepartments[employee.Department] = new List<Employee>();
+//        }
+//        employeesPerDepartments[employee.Department].Add(employee);
+//    }
+
+//    var result = new Dictionary<string, decimal>();
+
+//    foreach(var employeesPerDepartment in employeesPerDepartments)
+//    {
+//        decimal sumOfsalaries = 0;
+
+//        foreach (var employee in employeesPerDepartment.Value)
+//        {
+//            sumOfsalaries += employee.MonthlySalary;
+//        }
+
+//        var average = sumOfsalaries / employeesPerDepartment.Value.Count;
+
+//        result[employeesPerDepartment.Key] = average;
+//    }
+
+//    return result;
+//}
+
+//public class Employee
+//{
+//    public string Name { get; init; }
+//    public string Department { get; init; }
+//    public decimal MonthlySalary { get; init; }
+
+//    public Employee(string name, string department, decimal monthlySalary)
+//    {
+//        Name = name;
+//        Department = department;
+//        MonthlySalary = monthlySalary;
+//    }
+//}
+
+
+var dataDownloader = new SlowDataDownloader();
+Console.WriteLine(dataDownloader.DownloadData("id1"));
+Console.WriteLine(dataDownloader.DownloadData("id2"));
+Console.WriteLine(dataDownloader.DownloadData("id3"));
+Console.WriteLine(dataDownloader.DownloadData("id1"));
+Console.WriteLine(dataDownloader.DownloadData("id3"));
+Console.WriteLine(dataDownloader.DownloadData("id1"));
+Console.WriteLine(dataDownloader.DownloadData("id2"));
+
+
 
 Console.ReadKey();
 
-Dictionary<string, decimal> CalculateAverageSalaryPerDepartment(IEnumerable<Employee> employees)
+public class Cache<Tkey, TData>
 {
-    var employeesPerDepartments = new Dictionary<string, List<Employee>>();
-    foreach (var employee in employees)
+    private readonly Dictionary<Tkey, TData> _cachedData = new();
+
+    public TData Get(Tkey key, Func<Tkey, TData> getForTheFirstTime)
     {
-        if(!employeesPerDepartments.ContainsKey(employee.Department))
+        if (!_cachedData.ContainsKey(key))
         {
-            employeesPerDepartments[employee.Department] = new List<Employee>();
-        }
-        employeesPerDepartments[employee.Department].Add(employee);
-    }
-
-    var result = new Dictionary<string, decimal>();
-
-    foreach(var employeesPerDepartment in employeesPerDepartments)
-    {
-        decimal sumOfsalaries = 0;
-
-        foreach (var employee in employeesPerDepartment.Value)
-        {
-            sumOfsalaries += employee.MonthlySalary;
+            _cachedData[key] = getForTheFirstTime(key);
         }
 
-        var average = sumOfsalaries / employeesPerDepartment.Value.Count;
-
-        result[employeesPerDepartment.Key] = average;
+        return _cachedData[key];
     }
-
-    return result;
 }
 
-public class Employee
+public interface IDataDownloader
 {
-    public string Name { get; init; }
-    public string Department { get; init; }
-    public decimal MonthlySalary { get; init; }
-
-    public Employee(string name, string department, decimal monthlySalary)
+    string DownloadData(string resourceId);
+}
+public class SlowDataDownloader : IDataDownloader
+{
+    private readonly Cache<string, string> _cache = new();
+    public string DownloadData(string resourceId)
     {
-        Name = name;
-        Department = department;
-        MonthlySalary = monthlySalary;
+        return _cache.Get(resourceId, DownloadDatawithoutCachign);
+    }
+
+    private string DownloadDatawithoutCachign(string resourceId)
+    {
+
+        Thread.Sleep(1000);
+        return "Some data for " + resourceId;
     }
 }
