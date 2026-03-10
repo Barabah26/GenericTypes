@@ -184,88 +184,163 @@
 //}
 
 
-var people = new List<Person>
-{
-    new Person {Name = "John", YearOfBirth = 1980},
-    new Person {Name = "Anna", YearOfBirth = 1815},
-    new Person {Name = "Bill", YearOfBirth = 2150},
+//var people = new List<Person>
+//{
+//    new Person {Name = "John", YearOfBirth = 1980},
+//    new Person {Name = "Anna", YearOfBirth = 1815},
+//    new Person {Name = "Bill", YearOfBirth = 2150},
 
-};
+//};
+
+//var employees = new List<Employee>
+//{
+//    new Employee {Name = "John", YearOfBirth = 1980},
+//    new Employee {Name = "Anna", YearOfBirth = 1815},
+//    new Employee {Name = "Bill", YearOfBirth = 2150},
+
+//};
+
+//people.Sort();
+
+//var validPeople = GetOnlyValid(people);
+//var validEmployees = GetOnlyValid(employees);
+
+//foreach (var employee in validEmployees)
+//{
+//    employee.GoToWork();
+//}
+
+//Console.ReadKey();
+
+//void PrintInOrder<T>(T first, T second) where T : IComparable<T>
+//{
+//    if (first.CompareTo(second) > 0)
+//    {
+//        Console.WriteLine($"{second} {first}");
+//    }
+//    else
+//    {
+//        Console.WriteLine($"{first} {second}");
+//    }
+//}
+
+//IEnumerable<TPerson> GetOnlyValid<TPerson>(IEnumerable<TPerson> persons) where TPerson : Person
+//{
+//    var result = new List<TPerson>();
+
+//    foreach (var person in persons)
+//    {
+//        if (person.YearOfBirth > 1990 && 
+//            person.YearOfBirth < DateTime.Now.Year)
+//        {
+//            result.Add(person);
+//        }
+//    }
+
+//    return result;
+//}
+
+//public class Person: IComparable<Person>
+//{
+//    public string Name { get; init; }
+//    public int YearOfBirth { get; init; }
+
+//    public override string? ToString()
+//    {
+//        return base.ToString();
+//    }
+
+//    public int CompareTo(Person other)
+//    {
+//        if (YearOfBirth < other.YearOfBirth) 
+//        {
+//            return 1;
+//        } else if (YearOfBirth > other.YearOfBirth)
+//        {
+//            return -1;
+//        } else
+//        {
+//            return 0;
+//        }
+//    }
+//}
+
+//public class Employee : Person
+//{
+//    public void GoToWork() => Console.WriteLine("Going to work");
+//}
+
+
+//var countryToCurrencyMapping = new Dictionary<string, string>();
+
+//countryToCurrencyMapping.Add("USA", "USD");
+//countryToCurrencyMapping.Add("India", "INR");
+//countryToCurrencyMapping.Add("Spain", "EUR");
+
+//Console.WriteLine("Cuurency in Spain is " + countryToCurrencyMapping["Spain"]);
+
+//countryToCurrencyMapping["Poland"] = "PLN";
+//countryToCurrencyMapping["Poland"] = "EUR";
+
+//Console.WriteLine("Cuurency in Poland is " + countryToCurrencyMapping["Poland"]);
+
 
 var employees = new List<Employee>
 {
-    new Employee {Name = "John", YearOfBirth = 1980},
-    new Employee {Name = "Anna", YearOfBirth = 1815},
-    new Employee {Name = "Bill", YearOfBirth = 2150},
+    new Employee("Jake Smith", "Space Navigation", 25000),
+    new Employee("Anna Blake", "Space Navigation", 29000),
+    new Employee("Barbara Oak", "Xenobiology", 21500),
+    new Employee("Damien Parker", "Xenobiology", 22000),
+    new Employee("Hisha Patel", "Machanics", 21000),
+    new Employee("Gustavo Sanchez", "Machanics", 20000),
 
 };
 
-people.Sort();
-
-var validPeople = GetOnlyValid(people);
-var validEmployees = GetOnlyValid(employees);
-
-foreach (var employee in validEmployees)
-{
-    employee.GoToWork();
-}
+var result = CalculateAverageSalaryPerDepartment(employees);
 
 Console.ReadKey();
 
-void PrintInOrder<T>(T first, T second) where T : IComparable<T>
+Dictionary<string, decimal> CalculateAverageSalaryPerDepartment(IEnumerable<Employee> employees)
 {
-    if (first.CompareTo(second) > 0)
+    var employeesPerDepartments = new Dictionary<string, List<Employee>>();
+    foreach (var employee in employees)
     {
-        Console.WriteLine($"{second} {first}");
-    }
-    else
-    {
-        Console.WriteLine($"{first} {second}");
-    }
-}
-
-IEnumerable<TPerson> GetOnlyValid<TPerson>(IEnumerable<TPerson> persons) where TPerson : Person
-{
-    var result = new List<TPerson>();
-
-    foreach (var person in persons)
-    {
-        if (person.YearOfBirth > 1990 && 
-            person.YearOfBirth < DateTime.Now.Year)
+        if(!employeesPerDepartments.ContainsKey(employee.Department))
         {
-            result.Add(person);
+            employeesPerDepartments[employee.Department] = new List<Employee>();
         }
+        employeesPerDepartments[employee.Department].Add(employee);
+    }
+
+    var result = new Dictionary<string, decimal>();
+
+    foreach(var employeesPerDepartment in employeesPerDepartments)
+    {
+        decimal sumOfsalaries = 0;
+
+        foreach (var employee in employeesPerDepartment.Value)
+        {
+            sumOfsalaries += employee.MonthlySalary;
+        }
+
+        var average = sumOfsalaries / employeesPerDepartment.Value.Count;
+
+        result[employeesPerDepartment.Key] = average;
     }
 
     return result;
 }
 
-public class Person: IComparable<Person>
+public class Employee
 {
     public string Name { get; init; }
-    public int YearOfBirth { get; init; }
+    public string Department { get; init; }
+    public decimal MonthlySalary { get; init; }
 
-    public override string? ToString()
+    public Employee(string name, string department, decimal monthlySalary)
     {
-        return base.ToString();
+        Name = name;
+        Department = department;
+        MonthlySalary = monthlySalary;
     }
-
-    public int CompareTo(Person other)
-    {
-        if (YearOfBirth < other.YearOfBirth) 
-        {
-            return 1;
-        } else if (YearOfBirth > other.YearOfBirth)
-        {
-            return -1;
-        } else
-        {
-            return 0;
-        }
-    }
-}
-
-public class Employee : Person
-{
-    public void GoToWork() => Console.WriteLine("Going to work");
 }
